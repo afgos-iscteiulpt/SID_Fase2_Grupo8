@@ -10,11 +10,11 @@ public class MqttPublishSample {
 
         public static void main(String[] args) {
 
-            String topic        = "Did it work?";
-            String content      = "Hello I'm GODinho";
+            String topic        = "iscte_sid_2016_S1";
+            String content      = "999";
             int qos             = 0;
             String broker       = "tcp://iot.eclipse.org:443";
-            String clientId     = "js-utility-d1l9c";
+            String clientId     = "PC_GODinho";
             MemoryPersistence persistence = new MemoryPersistence();
 
             try {
