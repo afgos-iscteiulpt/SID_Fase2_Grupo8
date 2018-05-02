@@ -11,7 +11,7 @@ public class MqttPublishSample {
         public static void main(String[] args) {
 
             String topic        = "iscte_sid_2016_S1";
-            String content      = "999";
+            String content      = "Hello";
             int qos             = 0;
             String broker       = "tcp://iot.eclipse.org:443";
             String clientId     = "PC_GODinho";
