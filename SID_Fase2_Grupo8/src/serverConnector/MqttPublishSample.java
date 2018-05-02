@@ -6,15 +6,15 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-        public class MqttPublishSample {
+public class MqttPublishSample {
 
         public static void main(String[] args) {
 
-            String topic        = "MQTT Examples";
-            String content      = "Message from MqttPublishSample";
-            int qos             = 2;
-            String broker       = "tcp://iot.eclipse.org:1883";
-            String clientId     = "JavaSample";
+            String topic        = "Did it work?";
+            String content      = "Hello I'm GODinho";
+            int qos             = 0;
+            String broker       = "tcp://iot.eclipse.org:443";
+            String clientId     = "js-utility-d1l9c";
             MemoryPersistence persistence = new MemoryPersistence();
 
             try {
