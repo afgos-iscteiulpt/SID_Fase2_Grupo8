@@ -4,8 +4,9 @@ import java.sql.*;
 
 public class DatabaseManager {
 	static Connection conn;
+	
 
-	public DatabaseManager(String db, String user, String passwd, Object openserver, String databasepath) {
+	public DatabaseManager(String db, String user, String passwd) {
 		String dbUrl;
 		dbUrl = "jdbc:sqlanywhere:Tds:localhost:2638?eng=" + db;
 		try {
@@ -13,57 +14,27 @@ public class DatabaseManager {
 			conn.setAutoCommit(false);
 		} catch (Exception e) {
 			System.out.println("Server down, unable to make the connection. ");
-			Boolean openServer = (Boolean) openserver;
-			if (openServer.booleanValue())
-				try {
-					String engcommand = "dbeng12 " + databasepath + db + ".db";
-					Runtime.getRuntime().exec(engcommand);
-					long t0, t1;
-					t0 = System.currentTimeMillis();
-					do {
-						t1 = System.currentTimeMillis();
-					} while (t1 - t0 < 5000);
-					conn = DriverManager.getConnection(dbUrl, user, passwd);
-					conn.setAutoCommit(false);
-				} catch (Exception ex) {
-					System.out.println("Unable to start server. " + ex);
-				}
 		}
 	}
-
-	public void SelectStatement(String sql, ConnectionHandler ch) {
-		ch.r = null;
-		try {
-			ch.s = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-			ch.r = ch.s.executeQuery(sql);
-		} catch (Exception e) {
-			ch.returnStatus = e.toString();
-			System.out.println("Unable to execute the SelectStatement. " + e);
-		}
+	
+	public String[] prepareValues(String values){
+		
+		return null;
 	}
-
-	public void updateStatement(String sql, ConnectionHandler ch) {
-		Integer result = new Integer(0);
-		String message = null;
-		if (sql.trim().substring(0, 1).equalsIgnoreCase("U"))
-			message = "Number of rows updated: ";
-		else if (sql.trim().substring(0, 1).equalsIgnoreCase("I"))
-			message = "Number of rows inserted: ";
-		else
-			message = " ";
+	
+	//TODO
+	public void insertStatement(String table, String fields, String values, ConnectionHandler ch) {
+		Integer result = 0;
+		String message = "Number of rows inserted: ";
+		
 		try {
-			ch.s = conn.createStatement();
-			result = new Integer(ch.s.executeUpdate(sql));
+			ch.s=conn.createStatement();
+			result = new Integer(ch.s.executeUpdate("INSERT INTO " + table + "(" + fields + ")" + "VALUES(" + values + ")"));
 			ch.returnStatus = message + result;
 		} catch (Exception e) {
 			System.out.println("Unable to execute the insert/update/delete statement. " + e);
 			ch.returnStatus = "Error:" + e.toString();
 		}
-	}
-	
-	//TODO
-	public void insertStatement(String sql, ConnectionHandler ch) {
-		
 	}
 
 	public void returnResultSetSelectStatement(String sql, int resultsetType, ConnectionHandler ch) {
