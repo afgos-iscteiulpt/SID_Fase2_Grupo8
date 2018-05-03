@@ -1,4 +1,4 @@
-package migration;
+package migration.SQLA;
 
 import java.sql.*;
 

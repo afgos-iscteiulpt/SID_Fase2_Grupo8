@@ -1,4 +1,4 @@
-package migration;
+package migration.SQLA;
 
 import java.sql.*;
 
@@ -11,7 +11,9 @@ public class DatabaseManager {
 		dbUrl = "jdbc:sqlanywhere:Tds:localhost:2638?eng=" + db;
 		try {
 			conn = DriverManager.getConnection(dbUrl, user, passwd);
-			conn.setAutoCommit(false);
+			//must be true
+			//SERIOUSLY
+			conn.setAutoCommit(true);
 		} catch (Exception e) {
 			System.out.println("Server down, unable to make the connection. ");
 		}
@@ -23,6 +25,7 @@ public class DatabaseManager {
 		
 		try {
 			ch.s=conn.createStatement();
+			System.out.println("STATEMENT: " + "INSERT INTO " + table + "(" + fields + ")" + "VALUES(" + values + ")");
 			ch.s.executeUpdate("INSERT INTO " + table + "(" + fields + ")" + "VALUES(" + values + ")");
 			ch.returnStatus = message;
 		} catch (Exception e) {

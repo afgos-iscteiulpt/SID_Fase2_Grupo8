@@ -1,4 +1,4 @@
-package migration;
+package migration.MongoDB;
 
 public class MongoConnectionTester {
 
