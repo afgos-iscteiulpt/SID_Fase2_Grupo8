@@ -18,5 +18,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="drivers/sajdbc4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Admin/git/SID_Fase2_Grupo8/SID_Fase2_Grupo8/lib/jSerialComm-2.0.2.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
