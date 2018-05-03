@@ -17,6 +17,8 @@ public class DatabaseManager {
 		}
 	}
 	
+	//TODO: All of the things that are to be inserted need to be popped from the stack and then sorted out.
+	//This might work better on AnywhereDaemon?
 	public String[] prepareValues(String values){
 		
 		return null;
