@@ -1,5 +1,6 @@
 package migration.SQLA;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import migration.DataStack;
@@ -60,8 +61,16 @@ public class AnywhereDaemon {
 	}
 	
 	public static void main(String[] args) {
-		insertValuesToDB();
-		
-		System.out.println("Should be done!");
+		System.out.println("SQLA-DAEMON: Beginning process...");
+		while (true) {
+			while (!db.isCloseDatabase()) {
+				System.out.println("SQLA-DAEMON: Waiting for data on the stack...");
+				insertValuesToDB();
+				System.out.println("SQLA-DAEMON: Inserted new rows at " + LocalDateTime.now());
+			}
+			System.out.println("SQLA-DAEMON: WARNING - Database connection failed, attempting to reconnect...");
+			db = new DatabaseManager(DATABASE_NAME, USERNAME, PASSWORD);
+		}
+
 	}
 }
