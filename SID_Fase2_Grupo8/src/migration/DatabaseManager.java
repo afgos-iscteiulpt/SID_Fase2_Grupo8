@@ -60,6 +60,11 @@ public class DatabaseManager {
 			ch.returnStatus = "Error:" + e.toString();
 		}
 	}
+	
+	//TODO
+	public void insertStatement(String sql, ConnectionHandler ch) {
+		
+	}
 
 	public void returnResultSetSelectStatement(String sql, int resultsetType, ConnectionHandler ch) {
 		ch.r = null;
