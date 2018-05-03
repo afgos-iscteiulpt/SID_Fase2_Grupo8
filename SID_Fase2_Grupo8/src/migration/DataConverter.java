@@ -20,7 +20,7 @@ public class DataConverter {
 	}
 	
 	public static String getDateFromEPOCH(int epoch) {
-		DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		return format.format(new Date(Long.parseLong(String.valueOf(epoch))));
 	}
 
