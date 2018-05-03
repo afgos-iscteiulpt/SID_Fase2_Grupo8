@@ -17,22 +17,14 @@ public class DatabaseManager {
 		}
 	}
 	
-	//TODO: All of the things that are to be inserted need to be popped from the stack and then sorted out.
-	//This might work better on AnywhereDaemon?
-	public String[] prepareValues(String values){
-		
-		return null;
-	}
-	
 	//TODO
 	public void insertStatement(String table, String fields, String values, ConnectionHandler ch) {
-		Integer result = 0;
-		String message = "Number of rows inserted: ";
+		String message = "Inserted: " + values + "; into: " + table;
 		
 		try {
 			ch.s=conn.createStatement();
-			result = new Integer(ch.s.executeUpdate("INSERT INTO " + table + "(" + fields + ")" + "VALUES(" + values + ")"));
-			ch.returnStatus = message + result;
+			ch.s.executeUpdate("INSERT INTO " + table + "(" + fields + ")" + "VALUES(" + values + ")");
+			ch.returnStatus = message;
 		} catch (Exception e) {
 			System.out.println("Unable to execute the insert/update/delete statement. " + e);
 			ch.returnStatus = "Error:" + e.toString();
