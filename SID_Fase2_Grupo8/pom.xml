@@ -57,11 +57,6 @@
     <artifactId>json</artifactId>
     <version>20180130</version>
 </dependency>
-<dependency>
-		<groupId>org.mongodb</groupId>
-		<artifactId>mongo-java-driver</artifactId>
-		<version>2.10.1</version>
-	</dependency>
         <dependency>
         <groupId>org.mongodb</groupId>
         <artifactId>mongodb-driver</artifactId>
