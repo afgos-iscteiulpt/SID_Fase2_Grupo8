@@ -11,9 +11,9 @@ import java.util.LinkedList;
 public class DataStack {
 	
 	private static LinkedList<String[]> fifo = new LinkedList<String[]>();
-	private static final String table = "TestTable";
-	private static final String columns = "ID, Name, DateThing";
-	private static final String[] datatypes = {"integer", "varchar", "datetime"};
+	private static final String table = "HumidadeTemperatura";
+	private static final String columns = "DataMedicao, HoraMedicao, ValorMedicaoTemperatura, ValorMedicaoHumidade, IDMedicao";
+	private static final String[] datatypes = {"date", "time", "decimal", "decimal", "integer"};
 	
 	/**
 	 * Push data into the stack. Said data must be ORDERED DEPENDING ON THE TABLE YOU'RE MANIPULATING.\n
