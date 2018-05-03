@@ -1,4 +1,4 @@
-package migration;
+package migration.MongoDB;
 
 import java.sql.*;
 
@@ -12,6 +12,9 @@ import com.mongodb.client.MongoDatabase;
 import static com.mongodb.client.model.Filters.*;
 import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.client.model.ValidationOptions;
+
+import migration.DataConverter;
+import migration.DataStack;
 
 public class MongoConnection {
 	private String dbName = "databaseTest";
@@ -29,7 +32,7 @@ public class MongoConnection {
 	       @Override
 	       public void apply(final Document document) {
 	           System.out.println(document.toJson());
-	           DataConverter.convertJsonToString(document.toJson());
+	           DataStack.push(DataConverter.convertJsonToStringArray(document.toJson()));
 	       }
 	};
 
