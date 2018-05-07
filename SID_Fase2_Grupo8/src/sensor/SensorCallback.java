@@ -26,7 +26,8 @@ public class SensorCallback implements MqttCallback {
 		BasicDBObject document = new BasicDBObject();
 		document.put("humidade", jobj.get("humidity"));
 		document.put("temperatura", jobj.get("temperature"));
-		document.put("data", jobj.get("time"));
+		document.put("date", jobj.get("date"));
+		document.put("time", jobj.get("time"));
 		collection.insert(document);
 	}
 
