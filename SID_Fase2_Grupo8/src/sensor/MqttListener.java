@@ -16,7 +16,9 @@ public class MqttListener {
 
 	public static void run(String broker, String clientId, String topic) throws UnknownHostException, MqttException {
 		SensorCallback cb;
+		@SuppressWarnings("resource")
 		MongoClient mongo = new MongoClient(IPADDR, PORT);
+		@SuppressWarnings("deprecation")
 		DB db = mongo.getDB("sid");
 		DBCollection collection = db.getCollection("sid");
 		cb = new SensorCallback(collection);
