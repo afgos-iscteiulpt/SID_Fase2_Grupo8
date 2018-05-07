@@ -1,7 +1,5 @@
 package migration.MongoDB;
 
-import java.sql.*;
-
 import org.bson.Document;
 
 import com.mongodb.Block;
@@ -9,9 +7,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import static com.mongodb.client.model.Filters.*;
-import com.mongodb.client.model.CreateCollectionOptions;
-import com.mongodb.client.model.ValidationOptions;
 
 import migration.DataConverter;
 import migration.DataStack;
