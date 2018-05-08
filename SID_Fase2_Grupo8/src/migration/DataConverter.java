@@ -1,6 +1,7 @@
 package migration;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -9,23 +10,23 @@ import org.json.JSONObject;
 public class DataConverter {
 
 	public static String[] convertJsonToStringArray(String json) {
-		JSONObject obj = new JSONObject(json);
-		String[] data= new String[5];
-		data[0] = getDateFromEPOCH(obj.getJSONObject("DataHora").getInt("$date"));
-		data[1] = getHourFromEPOCH(obj.getJSONObject("DataHora").getInt("$date"));
-		data[2] = String.valueOf(obj.getDouble("ValorMedicaoTemperatura"));
-		data[3] = String.valueOf(obj.getDouble("ValorMedicaoHumidade"));
-		data[4] = String.valueOf(obj.getInt("IDMedicao"));
-		return data;
+		try {
+			JSONObject obj = new JSONObject(json);
+			String[] data = new String[5];
+			data[0] = convertDate(obj.getString("date"));
+			data[1] = obj.getString("time");
+			data[2] = String.valueOf(obj.getDouble("temperatura"));
+			data[3] = String.valueOf(obj.getDouble("humidade"));
+			return data;
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
-	public static String getDateFromEPOCH(int epoch) {
+	public static String convertDate(String date) throws ParseException {
+		Date initDate = new SimpleDateFormat("dd-MM-yyyy").parse(date);
 		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-		return format.format(new Date(Long.parseLong(String.valueOf(epoch))));
-	}
-
-	public static String getHourFromEPOCH(int epoch) {
-		DateFormat format = new SimpleDateFormat("HH:mm:ss");
-		return format.format(new Date(Long.parseLong(String.valueOf(epoch))));
+		return format.format(initDate);
 	}
 }

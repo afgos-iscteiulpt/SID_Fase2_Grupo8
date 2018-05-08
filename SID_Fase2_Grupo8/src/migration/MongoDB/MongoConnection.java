@@ -26,7 +26,9 @@ public class MongoConnection {
 	Block<Document> printBlock = new Block<Document>() {
 	       @Override
 	       public void apply(final Document document) {
-	           DataStack.push(DataConverter.convertJsonToStringArray(document.toJson()));
+	    	   String[] temp = DataConverter.convertJsonToStringArray(document.toJson());
+	    	   if(!temp.equals(null))
+	    		   DataStack.push(temp);
 	       }
 	};
 
