@@ -14,24 +14,34 @@ public class MqttListener {
 	private static final String IPADDR = "localhost";
 	private static final Integer PORT = 27017;
 
+
 	public static void run(String broker, String clientId, String topic) throws UnknownHostException, MqttException {
-		SensorCallback cb;
+		
+		
+		//----------MONGO DB--------------
 		@SuppressWarnings("resource")
 		MongoClient mongo = new MongoClient(IPADDR, PORT);
 		@SuppressWarnings("deprecation")
 		DB db = mongo.getDB("sid");
 		DBCollection collection = db.getCollection("sid");
-		cb = new SensorCallback(collection);
+		//----------MONGO DB--------------
+		
+		//----------MQTT CLIENT-----------
+		SensorCallback cb = new SensorCallback(collection);
 		MemoryPersistence persistence = new MemoryPersistence();
 		MqttClient sampleClient = new MqttClient(broker, clientId, persistence);
 		MqttConnectOptions connOpts = new MqttConnectOptions();
+		
 		connOpts.setCleanSession(true);
 		connOpts.setAutomaticReconnect(true);
 		connOpts.setKeepAliveInterval(10);
+		
 		sampleClient.setCallback(cb);
 		sampleClient.connect(connOpts);
 		sampleClient.subscribe(topic);
 		System.out.println("Subscribed");
+		
+		//----------MQTT CLIENT-----------
 	}
 
 	public static void main(String[] args) throws UnknownHostException, MqttException {
