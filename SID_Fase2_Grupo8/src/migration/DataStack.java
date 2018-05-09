@@ -4,27 +4,30 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 /**
- * Used to store the data that is imported from MongoDB and later exported to SQLA.
+ * Used to store the data that is imported from MongoDB and later exported to
+ * SQLA.
+ * 
  * @author pvmpa-iscteiulpt
  *
  */
 public class DataStack {
-	
+
 	private static LinkedList<String[]> fifoMongoToSQLA = new LinkedList<String[]>();
 	private static LinkedList<String[]> fifoSQLAToMongo = new LinkedList<String[]>();
 	private static final String table = "HumidadeTemperatura";
 	private static final String columns = "DataMedicao, HoraMedicao, ValorMedicaoTemperatura, ValorMedicaoHumidade, IDMedicao";
-	private static final String[] datatypes = {"date", "time", "decimal", "decimal", "integer"};
-	
-	
+	private static final String[] datatypes = { "date", "time", "decimal", "decimal", "integer" };
+
 	/////////////////////////////////
-	//////fifoMongoToSQLA Stuff//////
+	////// fifoMongoToSQLA Stuff//////
 	/////////////////////////////////
-	
+
 	/**
-	 * Push data into the MongoToSQLA stack. Said data must be ORDERED DEPENDING ON THE TABLE YOU'RE MANIPULATING.\n
-	 * Example: If you're manipulating a table 'Example(ID: int, Name: varchar, Date: timestamp)', then
-	 * the pushed data should look something like this: {"1", "MyName", "2018-02-02 00:00:00'"}
+	 * Push data into the MongoToSQLA stack. Said data must be ORDERED DEPENDING ON
+	 * THE TABLE YOU'RE MANIPULATING.\n Example: If you're manipulating a table
+	 * 'Example(ID: int, Name: varchar, Date: timestamp)', then the pushed data
+	 * should look something like this: {"1", "MyName", "2018-02-02 00:00:00'"}
+	 * 
 	 * @param data
 	 */
 	public static void pushToSQLA(String[] data) {
@@ -33,10 +36,11 @@ public class DataStack {
 			fifoMongoToSQLA.notifyAll();
 		}
 	}
-	
+
 	/**
-	 * Pop data from the MongoToSQLA stack. Said data is a list of arrays of Strings. Each field of the array contains
-	 * the data to be exported into SQLA.
+	 * Pop data from the MongoToSQLA stack. Said data is a list of arrays of
+	 * Strings. Each field of the array contains the data to be exported into SQLA.
+	 * 
 	 * @return Stuff to put into the database
 	 */
 	public static ArrayList<String[]> popAllFromMongoToSQLA() {
@@ -56,45 +60,42 @@ public class DataStack {
 		}
 		return data;
 	}
-	
+
 	/////////////////////////////////
-	//////fifoSQLAToMongo Stuff//////
+	////// fifoSQLAToMongo Stuff//////
 	/////////////////////////////////
-	
+
 	/**
-	 * Pop data from the SQLAToMongo stack. Said data is a list of arrays of Strings. Each field of the array contains
-	 * the data to be exported into SQLA.
+	 * Pop data from the SQLAToMongo stack. Said data is a list of arrays of
+	 * Strings. Each field of the array contains the data to be exported into SQLA.
+	 * 
 	 * @return Stuff to put into the database
 	 */
 	public static ArrayList<String[]> popAllFromSQLAToMongo() {
 		ArrayList<String[]> data = new ArrayList<String[]>();
 		synchronized (fifoSQLAToMongo) {
-			try {
-				if (fifoSQLAToMongo.isEmpty()) {
-					fifoSQLAToMongo.wait();
-				}
-				while (!fifoSQLAToMongo.isEmpty()) {
-					data.add(fifoSQLAToMongo.removeFirst());
-				}
-			} catch (InterruptedException e) {
-				System.out.println("WARNING: INTERRUPTED ON POP, ABORTING PROCEDURE IMMEDIATELY!!!");
-				e.printStackTrace();
+			if (fifoSQLAToMongo.isEmpty()) {
+				return null;
+			}
+			while (!fifoSQLAToMongo.isEmpty()) {
+				data.add(fifoSQLAToMongo.removeFirst());
 			}
 		}
 		return data;
 	}
-	
+
 	/**
-	 * Push data into the fifoSQLAToMongo stack. Said data must be ORDERED DEPENDING ON THE TABLE YOU'RE MANIPULATING.\n
-	 * Example: If you're manipulating a table 'Example(ID: int, Name: varchar, Date: timestamp)', then
-	 * the pushed data should look something like this: {"1", "MyName", "2018-02-02 00:00:00'"}
-	 * Used for data consistency.
+	 * Push data into the fifoSQLAToMongo stack. Said data must be ORDERED DEPENDING
+	 * ON THE TABLE YOU'RE MANIPULATING.\n Example: If you're manipulating a table
+	 * 'Example(ID: int, Name: varchar, Date: timestamp)', then the pushed data
+	 * should look something like this: {"1", "MyName", "2018-02-02 00:00:00'"} Used
+	 * for data consistency.
+	 * 
 	 * @param data
 	 */
 	public static void pushToMongo(String[] data) {
 		synchronized (fifoSQLAToMongo) {
 			fifoSQLAToMongo.add(data);
-			fifoSQLAToMongo.notifyAll();
 		}
 	}
 
