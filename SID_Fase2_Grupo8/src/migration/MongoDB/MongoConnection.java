@@ -44,12 +44,14 @@ public class MongoConnection extends Thread {
 	}
 
 	Block<Document> printBlock = new Block<Document>() {
+
+		
 		@Override
 		public void apply(final Document document) {
 			System.out.println(document);
 			String[] temp = DataConverter.convertJsonToStringArray(document.toJson());
 			if (temp!=null)
-				DataStack.push(temp);
+				DataStack.pushToSQLA(temp);
 		}
 	};
 
