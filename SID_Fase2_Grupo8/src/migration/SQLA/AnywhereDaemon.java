@@ -17,7 +17,7 @@ public class AnywhereDaemon {
 	private static ArrayList<String[]> prepareValues(){
 		ArrayList<String[]> newData = new ArrayList<String[]>();
 		while (newData.isEmpty()) {
-			newData = DataStack.popAll();
+			newData = DataStack.popAllFromMongoToSQLA();
 		}
 		return newData;
 	}
@@ -30,7 +30,7 @@ public class AnywhereDaemon {
 		for (String[] values: data) {
 			String values_statement = "";
 			
-			for (int i = 0; i < values.length; i++) {
+			for (int i = 0; i < values.length-1; i++) {
 				switch (DataStack.getDatatypes()[i]) {
 					case "integer":
 						values_statement = values_statement.concat(values[i] + ",");

@@ -28,7 +28,7 @@ public class MongoConnection {
 	       public void apply(final Document document) {
 	    	   String[] temp = DataConverter.convertJsonToStringArray(document.toJson());
 	    	   if(!temp.equals(null))
-	    		   DataStack.push(temp);
+	    		   DataStack.pushToSQLA(temp);
 	       }
 	};
 
