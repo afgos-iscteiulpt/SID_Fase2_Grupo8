@@ -32,6 +32,12 @@ public class DataStack {
 	 */
 	public static void pushToSQLA(String[] data) {
 		synchronized (fifoMongoToSQLA) {
+			
+			for (int i = 0; i < data.length; i++) {
+				System.out.print(data[i] + " ");
+			}
+			System.out.println("");
+			
 			fifoMongoToSQLA.add(data);
 			fifoMongoToSQLA.notifyAll();
 		}

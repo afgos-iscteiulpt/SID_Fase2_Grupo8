@@ -43,8 +43,9 @@ public class MongoConnection extends Thread {
 			for (String[] data : list) {
 				documents.add(new Document().append("date", data[0]).append("time", data[1]).append("temperatura", data[2]).append("humidade", data[3]));
 			}
+			collection.insertMany(documents);
 		}
-		collection.insertMany(documents);
+		
 	}
 
 	public MongoDatabase mongoConnect(String username, String password) {

@@ -19,8 +19,6 @@ public class TestMongoToSQLA {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String[] thing = {"12-02-1997", "16:00:00", "69", "69"};
-		DataStack.pushToSQLA(thing);
 		
 	}
 }
