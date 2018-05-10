@@ -14,9 +14,7 @@ public class DataStack {
 
 	private static LinkedList<String[]> fifoMongoToSQLA = new LinkedList<String[]>();
 	private static LinkedList<String[]> fifoSQLAToMongo = new LinkedList<String[]>();
-	private static final String table = "HumidadeTemperatura";
-	private static final String columns = "DataMedicao, HoraMedicao, ValorMedicaoTemperatura, ValorMedicaoHumidade";
-	private static final String[] datatypes = { "date", "time", "decimal", "decimal" };
+	
 
 	/////////////////////////////////
 	////// fifoMongoToSQLA Stuff//////
@@ -103,18 +101,6 @@ public class DataStack {
 		synchronized (fifoSQLAToMongo) {
 			fifoSQLAToMongo.add(data);
 		}
-	}
-
-	public static String getColumns() {
-		return columns;
-	}
-
-	public static String getTable() {
-		return table;
-	}
-
-	public static String[] getDatatypes() {
-		return datatypes;
 	}
 
 }

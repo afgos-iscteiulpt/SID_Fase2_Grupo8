@@ -11,6 +11,10 @@ public class AnywhereDaemon {
 	private static final String USERNAME = "dba";
 	private static final String PASSWORD = "sql";
 	
+	private static final String table = "HumidadeTemperatura";
+	private static final String columns = "DataMedicao, HoraMedicao, ValorMedicaoTemperatura, ValorMedicaoHumidade";
+	private static final String[] datatypes = { "date", "time", "decimal", "decimal" };
+	
 	private static ConnectionHandler ch = new ConnectionHandler();
 	private static DatabaseManager db = new DatabaseManager(DATABASE_NAME, USERNAME, PASSWORD);
 	
@@ -24,13 +28,11 @@ public class AnywhereDaemon {
 	
 	private static void insertValuesToDB() {
 		ArrayList<String[]> data = prepareValues();
-		String columns = DataStack.getColumns();
-		String table = DataStack.getTable();
 		
 		for (String[] values: data) {
 			boolean successful_insert = false;
-			
 			String values_statement = parseValues(values);
+			
 			while (!successful_insert) {
 				successful_insert = db.insertStatement(table, columns, values_statement, ch);
 				if (successful_insert) {
@@ -52,7 +54,7 @@ public class AnywhereDaemon {
 		String values_statement = "";
 		for (int i = 0; i < values.length - 1; i++) { // values.length-1 because we don't want to export ObjectID to
 														// SQLA
-			switch (DataStack.getDatatypes()[i]) {
+			switch (datatypes[i]) {
 			case "integer":
 				values_statement = values_statement.concat(values[i] + ",");
 				break;

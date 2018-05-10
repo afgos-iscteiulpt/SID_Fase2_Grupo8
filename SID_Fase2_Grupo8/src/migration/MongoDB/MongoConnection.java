@@ -19,7 +19,7 @@ import migration.DataStack;
 public class MongoConnection extends Thread {
 	private String dbName = "databaseTest";
 	private String sensorCollectionName = "HumidadeTemperatura";
-	private String migratedCollectionName = "HumidadeTemperaturaMigracao";
+	private String migratedCollectionName = "HumidadeTemperaturaMigrated";
 	private String username = "";
 	private String password = "";
 	private final int requestPeriodicity = 10000;
