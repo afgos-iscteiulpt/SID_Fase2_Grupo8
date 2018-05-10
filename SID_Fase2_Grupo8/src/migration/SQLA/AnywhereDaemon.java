@@ -28,35 +28,50 @@ public class AnywhereDaemon {
 		String table = DataStack.getTable();
 		
 		for (String[] values: data) {
-			String values_statement = "";
+			boolean successful_insert = false;
 			
-			for (int i = 0; i < values.length-1; i++) {
+			String values_statement = "";
+			for (int i = 0; i < values.length - 1; i++) { // values.length-1 because we don't want to export ObjectID to
+															// SQLA
 				switch (DataStack.getDatatypes()[i]) {
-					case "integer":
-						values_statement = values_statement.concat(values[i] + ",");
-						break;
-					case "varchar":
-						values_statement = values_statement.concat("'" + values[i] + "',");
-						break;
-					case "decimal":
-						values_statement = values_statement.concat(values[i] + ",");
-						break;
-					case "date":
-						values_statement = values_statement.concat("'" + values[i] + "',");
-						break;
-					case "time":
-						values_statement = values_statement.concat("'" + values[i] + "',");
-						break;
-					case "datetime":
-						values_statement = values_statement.concat("'" + values[i] + "',");
-						break;
-					case "timestamp":
-						values_statement = values_statement.concat("'" + values[i] + "',");
-						break;
+				case "integer":
+					values_statement = values_statement.concat(values[i] + ",");
+					break;
+				case "varchar":
+					values_statement = values_statement.concat("'" + values[i] + "',");
+					break;
+				case "decimal":
+					values_statement = values_statement.concat(values[i] + ",");
+					break;
+				case "date":
+					values_statement = values_statement.concat("'" + values[i] + "',");
+					break;
+				case "time":
+					values_statement = values_statement.concat("'" + values[i] + "',");
+					break;
+				case "datetime":
+					values_statement = values_statement.concat("'" + values[i] + "',");
+					break;
+				case "timestamp":
+					values_statement = values_statement.concat("'" + values[i] + "',");
+					break;
 				}
 			}
 			values_statement = values_statement.substring(0, values_statement.length() - 1) + "";
-			db.insertStatement(table, columns, values_statement, ch);
+			while (!successful_insert) {
+				successful_insert = db.insertStatement(table, columns, values_statement, ch);
+				if (successful_insert) {
+					DataStack.pushToMongo(values);
+				} else {
+					System.out.println("WARNING: Insert failed, trying again in 1 sec...");
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						System.out.println("Why am I being interrupted during my beauty sleep? " + e);
+					}
+					continue;
+				}
+			}
 		}
 	}
 	

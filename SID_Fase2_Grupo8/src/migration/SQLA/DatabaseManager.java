@@ -20,17 +20,18 @@ public class DatabaseManager {
 	}
 	
 	//TODO
-	public void insertStatement(String table, String fields, String values, ConnectionHandler ch) {
+	public boolean insertStatement(String table, String fields, String values, ConnectionHandler ch) {
 		String message = "Inserted: " + values + "; into: " + table;
-		
 		try {
 			ch.s=conn.createStatement();
 			System.out.println("STATEMENT: " + "INSERT INTO " + table + "(" + fields + ")" + "VALUES(" + values + ")");
 			ch.s.executeUpdate("INSERT INTO " + table + "(" + fields + ")" + "VALUES(" + values + ")");
 			ch.returnStatus = message;
+			return true;
 		} catch (Exception e) {
 			System.out.println("Unable to execute the insert/update/delete statement. " + e);
 			ch.returnStatus = "Error:" + e.toString();
+			return false;
 		}
 	}
 
