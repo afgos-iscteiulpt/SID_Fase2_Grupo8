@@ -4,19 +4,16 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import migration.DataStack;
+import static migration.DataConfig.*;
 
 public class AnywhereDaemon {
-	
-	private static final String DATABASE_NAME = "test_database";
-	private static final String USERNAME = "dba";
-	private static final String PASSWORD = "sql";
 	
 	private static final String table = "HumidadeTemperatura";
 	private static final String columns = "DataMedicao, HoraMedicao, ValorMedicaoTemperatura, ValorMedicaoHumidade";
 	private static final String[] datatypes = { "date", "time", "decimal", "decimal" };
 	
 	private static ConnectionHandler ch = new ConnectionHandler();
-	private static DatabaseManager db = new DatabaseManager(DATABASE_NAME, USERNAME, PASSWORD);
+	private static DatabaseManager db = new DatabaseManager(SQLA_DBNAME, SQLA_USERNAME, SQLA_PASSWORD);
 	
 	private static ArrayList<String[]> prepareValues(){
 		ArrayList<String[]> newData = new ArrayList<String[]>();
@@ -91,7 +88,7 @@ public class AnywhereDaemon {
 				System.out.println("SQLA-DAEMON: Inserted new rows at " + LocalDateTime.now());
 			}
 			System.out.println("SQLA-DAEMON: WARNING - Database connection failed, attempting to reconnect...");
-			db = new DatabaseManager(DATABASE_NAME, USERNAME, PASSWORD);
+			db = new DatabaseManager(SQLA_DBNAME, SQLA_USERNAME, SQLA_PASSWORD);
 		}
 
 	}

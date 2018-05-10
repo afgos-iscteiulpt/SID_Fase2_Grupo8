@@ -1,6 +1,7 @@
 package migration.MongoDB;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bson.Document;
@@ -13,52 +14,38 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import static com.mongodb.client.model.Filters.*;
 
+import static migration.DataConfig.*;
 import migration.DataConverter;
 import migration.DataStack;
 
 public class MongoConnection extends Thread {
-	private String dbName = "databaseTest";
-	private String sensorCollectionName = "HumidadeTemperatura";
-	private String migratedCollectionName = "HumidadeTemperaturaMigrated";
-	private String username = "";
-	private String password = "";
-	private final int requestPeriodicity = 10000;
+
+	private MongoDatabase db;
 
 	@Override
 	public void run() {
-		MongoDatabase db = mongoConnect(username, password);
+		db = mongoConnect();
+		new MongoSuccessfulThread().start();
 		try {
 			while (true) {
-				MongoCollection<Document> collection = db.getCollection(sensorCollectionName);
+				MongoCollection<Document> collection = db.getCollection(SENSOR_COLLECTION_NAME);
 				collection.find().forEach(printBlock);
-				sleep(requestPeriodicity);
-				MongoCollection<Document> migratedCollection = db.getCollection(migratedCollectionName);
-				saveAndDeleteSucessfulData(collection, migratedCollection);
+				sleep(REQUEST_PERIODICITY);
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void saveAndDeleteSucessfulData(MongoCollection<Document> collection, MongoCollection<Document> migratedCollection) {
-		ArrayList<String[]> list = DataStack.popAllFromSQLAToMongo();
-		List<Document> documents = new ArrayList<Document>();
-		if (list != null) {
-			for (String[] data : list) {
-				System.out.println("Adding " + data[4]);
-				documents.add(new Document().append("date", data[0]).append("time", data[1]).append("temperatura", data[2]).append("humidade", data[3]));
-			}
-			migratedCollection.insertMany(documents);
-			for (String[] data : list) {
-				collection.deleteOne(eq("_id", new ObjectId(data[4])));
-			}
-		}
-		
-	}
-
-	public MongoDatabase mongoConnect(String username, String password) {
-		MongoClient mongoClient = MongoClients.create();
-		return mongoClient.getDatabase(dbName);
+	public MongoDatabase mongoConnect() {
+		MongoCredential credential = MongoCredential.createCredential(MONGO_USERNAME, "admin",
+				MONGO_PASSWORD.toCharArray());
+		MongoClientSettings settings = MongoClientSettings.builder().credential(credential)
+				.applyToSslSettings(builder -> builder.enabled(false))
+				.applyToClusterSettings(builder -> builder.hosts(Arrays.asList(new ServerAddress("localhost", 27017))))
+				.build();
+		MongoClient mongoClient = MongoClients.create(settings);
+		return mongoClient.getDatabase(MONGO_DBNAME);
 
 	}
 
@@ -68,24 +55,44 @@ public class MongoConnection extends Thread {
 		public void apply(final Document document) {
 			System.out.println(document);
 			String[] temp = DataConverter.convertJsonToStringArray(document.toJson());
+			System.out.println("=================PUSHING=================");
+			for (String s : temp) {
+				System.out.println(s);
+			}
+			System.out.println("================PUSH DONE================");
 			if (temp != null)
 				DataStack.pushToSQLA(temp);
 		}
 	};
 
-	public String getDbName() {
-		return dbName;
-	}
+	private class MongoSuccessfulThread extends Thread {
 
-	public void setDbName(String dbName) {
-		this.dbName = dbName;
-	}
+		@Override
+		public void run() {
+			while (true) {
+				MongoCollection<Document> collection = db.getCollection(SENSOR_COLLECTION_NAME);
+				MongoCollection<Document> migratedCollection = db.getCollection(MIGRATED_COLLECTION_NAME);
+				saveAndDeleteSucessfulData(collection, migratedCollection);
+			}
+		}
 
-	public String getCollectionName() {
-		return sensorCollectionName;
-	}
+		public void saveAndDeleteSucessfulData(MongoCollection<Document> collection,
+				MongoCollection<Document> migratedCollection) {
+			ArrayList<String[]> list = DataStack.popAllFromSQLAToMongo();
+			List<Document> documents = new ArrayList<Document>();
+			if (list != null) {
+				for (String[] data : list) {
+					System.out.println("Adding " + data[4]);
+					documents.add(new Document().append("date", data[0]).append("time", data[1])
+							.append("temperatura", data[2]).append("humidade", data[3]));
+				}
+				migratedCollection.insertMany(documents);
+				for (String[] data : list) {
+					collection.deleteOne(eq("_id", new ObjectId(data[4])));
+				}
+			}
 
-	public void setCollectionName(String collectionName) {
-		this.sensorCollectionName = collectionName;
+		}
+
 	}
 }

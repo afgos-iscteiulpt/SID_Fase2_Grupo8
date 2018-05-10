@@ -1,29 +1,29 @@
 package migration.SQLA;
 
 import java.sql.*;
+import static migration.DataConfig.*;
 
 public class DatabaseManager {
 	static Connection conn;
-	
 
 	public DatabaseManager(String db, String user, String passwd) {
 		String dbUrl;
-		dbUrl = "jdbc:sqlanywhere:Tds:localhost:2638?eng=" + db;
+		dbUrl = SQLA_DBURL + db;
 		try {
 			conn = DriverManager.getConnection(dbUrl, user, passwd);
-			//must be true
-			//SERIOUSLY
+			// must be true
+			// SERIOUSLY
 			conn.setAutoCommit(true);
 		} catch (Exception e) {
 			System.out.println("Server down, unable to make the connection. ");
 		}
 	}
-	
-	//TODO
+
+	// TODO
 	public boolean insertStatement(String table, String fields, String values, ConnectionHandler ch) {
 		String message = "Inserted: " + values + "; into: " + table;
 		try {
-			ch.s=conn.createStatement();
+			ch.s = conn.createStatement();
 			System.out.println("STATEMENT: " + "INSERT INTO " + table + "(" + fields + ")" + "VALUES(" + values + ")");
 			ch.s.executeUpdate("INSERT INTO " + table + "(" + fields + ")" + "VALUES(" + values + ")");
 			ch.returnStatus = message;

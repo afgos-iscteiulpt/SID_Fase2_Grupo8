@@ -14,7 +14,6 @@ public class DataStack {
 
 	private static LinkedList<String[]> fifoMongoToSQLA = new LinkedList<String[]>();
 	private static LinkedList<String[]> fifoSQLAToMongo = new LinkedList<String[]>();
-	
 
 	/////////////////////////////////
 	////// fifoMongoToSQLA Stuff//////
@@ -30,12 +29,12 @@ public class DataStack {
 	 */
 	public static void pushToSQLA(String[] data) {
 		synchronized (fifoMongoToSQLA) {
-			
+
 			for (int i = 0; i < data.length; i++) {
 				System.out.print(data[i] + " ");
 			}
 			System.out.println("");
-			
+
 			fifoMongoToSQLA.add(data);
 			fifoMongoToSQLA.notifyAll();
 		}
@@ -78,11 +77,16 @@ public class DataStack {
 	public static ArrayList<String[]> popAllFromSQLAToMongo() {
 		ArrayList<String[]> data = new ArrayList<String[]>();
 		synchronized (fifoSQLAToMongo) {
-			if (fifoSQLAToMongo.isEmpty()) {
-				return null;
-			}
-			while (!fifoSQLAToMongo.isEmpty()) {
-				data.add(fifoSQLAToMongo.removeFirst());
+			try {
+				if (fifoSQLAToMongo.isEmpty()) {
+					fifoSQLAToMongo.wait();
+				}
+				while (!fifoSQLAToMongo.isEmpty()) {
+					data.add(fifoSQLAToMongo.removeFirst());
+				}
+			} catch (InterruptedException e) {
+				System.out.println("WARNING: INTERRUPTED ON POP, ABORTING PROCEDURE IMMEDIATELY!!!");
+				e.printStackTrace();
 			}
 		}
 		return data;
@@ -100,6 +104,7 @@ public class DataStack {
 	public static void pushToMongo(String[] data) {
 		synchronized (fifoSQLAToMongo) {
 			fifoSQLAToMongo.add(data);
+			fifoSQLAToMongo.notifyAll();
 		}
 	}
 
