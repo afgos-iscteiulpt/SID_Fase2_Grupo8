@@ -49,8 +49,6 @@ public class MongoConnection extends Thread {
 		return mongoClient.getDatabase(MONGO_DBNAME);
 
 	}
-	
-	
 
 	Block<Document> printBlock = new Block<Document>() {
 
@@ -59,7 +57,10 @@ public class MongoConnection extends Thread {
 			System.out.println(document);
 			String[] temp = DataConverter.convertJsonToStringArray(document.toJson());
 			if (temp != null)
-				DataStack.pushToSQLA(temp);
+				if (!DataStack.isInCache(temp[4]))
+					DataStack.pushToSQLA(temp);
+				else
+					System.out.println(temp[4] + "it's in cache!");
 			else {
 				MongoCollection<Document> collection = db.getCollection(SENSOR_COLLECTION_NAME);
 				JSONObject obj = new JSONObject(document.toJson());

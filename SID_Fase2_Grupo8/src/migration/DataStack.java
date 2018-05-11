@@ -108,4 +108,14 @@ public class DataStack {
 		}
 	}
 
+	public static boolean isInCache(String id) {
+		synchronized (fifoSQLAToMongo) {
+			for (String[] data : fifoMongoToSQLA) {
+				if (data[4].equals(id))
+					return true;
+			}
+			return false;
+		}
+	}
+
 }
