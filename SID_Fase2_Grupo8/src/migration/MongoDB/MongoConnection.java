@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.json.JSONObject;
 
 import com.mongodb.*;
 import com.mongodb.client.MongoClients;
@@ -48,6 +49,8 @@ public class MongoConnection extends Thread {
 		return mongoClient.getDatabase(MONGO_DBNAME);
 
 	}
+	
+	
 
 	Block<Document> printBlock = new Block<Document>() {
 
@@ -55,13 +58,13 @@ public class MongoConnection extends Thread {
 		public void apply(final Document document) {
 			System.out.println(document);
 			String[] temp = DataConverter.convertJsonToStringArray(document.toJson());
-			System.out.println("=================PUSHING=================");
-			for (String s : temp) {
-				System.out.println(s);
-			}
-			System.out.println("================PUSH DONE================");
 			if (temp != null)
 				DataStack.pushToSQLA(temp);
+			else {
+				MongoCollection<Document> collection = db.getCollection(SENSOR_COLLECTION_NAME);
+				JSONObject obj = new JSONObject(document.toJson());
+				collection.deleteOne(eq("_id", new ObjectId(obj.getJSONObject("_id").getString("$oid"))));
+			}
 		}
 	};
 
