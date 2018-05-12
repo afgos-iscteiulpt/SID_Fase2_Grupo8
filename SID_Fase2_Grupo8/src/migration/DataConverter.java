@@ -9,6 +9,11 @@ import org.json.JSONObject;
 
 public class DataConverter {
 
+	private static int maxVariationFlowPerSecond = 5;
+	private static int lastTemperatura = -1000;
+	private static int lastHumidade = -1000;
+	private static long lastDate = -1000;
+
 	public static String[] convertJsonToStringArray(String json) {
 		try {
 			JSONObject obj = new JSONObject(json);
@@ -19,35 +24,33 @@ public class DataConverter {
 			data[3] = obj.getString("humidade");
 			data[4] = obj.getJSONObject("_id").getString("$oid");
 			if (dataCheck(data))
-				return data;
+				if (!isHighVariation(data))
+					return data;
 			return null;
 		} catch (ParseException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
-	
+
 	private static boolean dataCheck(String[] data) throws ParseException {
-		//date was already checked in convert date
-		return 	checkTime(data[1]) &&
-		checkTemperatura(data[2]) &&
-		checkHumidade(data[3]) &&
-		data[4]!=null;
-		
+		// date was already checked in convert date
+		return checkTime(data[1]) && checkTemperatura(data[2]) && checkHumidade(data[3]) && data[4] != null;
+
 	}
 
 	private static boolean checkHumidade(String string) {
-		if(string!=null) {
-				int temp = Integer.parseInt(string);
-				return temp>=0 && temp<100;
+		if (string != null) {
+			int temp = Integer.parseInt(string);
+			return temp >= 0 && temp < 100;
 		}
 		return false;
 	}
 
 	private static boolean checkTemperatura(String string) {
-		if(string!=null) {
+		if (string != null) {
 			int temp = Integer.parseInt(string);
-			return temp>=-272;
+			return temp >= -272;
 		}
 		return false;
 	}
@@ -55,9 +58,43 @@ public class DataConverter {
 	private static boolean checkTime(String string) throws ParseException {
 		DateFormat format = new SimpleDateFormat("HH:mm:ss");
 		format.setLenient(false);
-		@SuppressWarnings("unused") //if it's an invalid date, the parse will throw an exception
+		@SuppressWarnings("unused") // if it's an invalid date, the parse will throw an exception
 		Date theDate = format.parse(string);
 		return true;
+	}
+
+	private static boolean isHighVariation(String[] data) {
+		if (lastTemperatura == -1000 || lastHumidade == -1000 || lastDate == -1000) {
+			lastTemperatura = Integer.parseInt(data[2]);
+			lastHumidade = Integer.parseInt(data[3]);
+			lastDate = convertStringToEpoch(data[0], data[1]);
+			return false;
+		} else {
+			long timeDifferenceInSeconds = (convertStringToEpoch(data[0], data[1]) - lastDate) / 1000;
+			double temperaturaDifference = Integer.parseInt(data[2]) - lastTemperatura;
+			double humidadeDifference = Integer.parseInt(data[3]) - lastHumidade;
+			if (temperaturaDifference / timeDifferenceInSeconds > maxVariationFlowPerSecond
+					|| humidadeDifference / timeDifferenceInSeconds > maxVariationFlowPerSecond) {
+				return true;
+			}
+			lastTemperatura = Integer.parseInt(data[2]);
+			lastHumidade = Integer.parseInt(data[3]);
+			lastDate = convertStringToEpoch(data[0], data[1]);
+			return false;
+		}
+	}
+
+	private static long convertStringToEpoch(String date, String time) {
+		try {
+			String str = date + time;
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-ddHH:mm:ss");
+			Date temDate;
+			temDate = df.parse(str);
+			return temDate.getTime();
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return -1000;
+		}
 	}
 
 	public static String convertDate(String date) throws ParseException {
@@ -66,6 +103,5 @@ public class DataConverter {
 		format.setLenient(false);
 		return format.format(initDate);
 	}
-	
-	
+
 }
