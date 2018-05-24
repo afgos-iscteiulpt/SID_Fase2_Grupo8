@@ -10,8 +10,8 @@ import org.json.JSONObject;
 public class DataConverter {
 
 	private static int maxVariationFlowPerSecond = 5;
-	private static int lastTemperatura = -1000;
-	private static int lastHumidade = -1000;
+	private static double lastTemperatura = -1000;
+	private static double lastHumidade = -1000;
 	private static long lastDate = -1000;
 
 	public static String[] convertJsonToStringArray(String json) {
@@ -41,7 +41,7 @@ public class DataConverter {
 
 	private static boolean checkHumidade(String string) {
 		if (string != null) {
-			int temp = Integer.parseInt(string);
+			double temp = Double.parseDouble(string);
 			return temp >= 0 && temp < 100;
 		}
 		return false;
@@ -49,7 +49,7 @@ public class DataConverter {
 
 	private static boolean checkTemperatura(String string) {
 		if (string != null) {
-			int temp = Integer.parseInt(string);
+			double temp = Double.parseDouble(string);
 			return temp >= -272;
 		}
 		return false;
@@ -65,20 +65,20 @@ public class DataConverter {
 
 	private static boolean isHighVariation(String[] data) {
 		if (lastTemperatura == -1000 || lastHumidade == -1000 || lastDate == -1000) {
-			lastTemperatura = Integer.parseInt(data[2]);
-			lastHumidade = Integer.parseInt(data[3]);
+			lastTemperatura = Double.parseDouble(data[2]);
+			lastHumidade = Double.parseDouble(data[3]);
 			lastDate = convertStringToEpoch(data[0], data[1]);
 			return false;
 		} else {
 			long timeDifferenceInSeconds = (convertStringToEpoch(data[0], data[1]) - lastDate) / 1000;
-			double temperaturaDifference = Integer.parseInt(data[2]) - lastTemperatura;
-			double humidadeDifference = Integer.parseInt(data[3]) - lastHumidade;
+			double temperaturaDifference = Double.parseDouble(data[2]) - lastTemperatura;
+			double humidadeDifference = Double.parseDouble(data[3]) - lastHumidade;
 			if (temperaturaDifference / timeDifferenceInSeconds > maxVariationFlowPerSecond
 					|| humidadeDifference / timeDifferenceInSeconds > maxVariationFlowPerSecond) {
 				return true;
 			}
-			lastTemperatura = Integer.parseInt(data[2]);
-			lastHumidade = Integer.parseInt(data[3]);
+			lastTemperatura = Double.parseDouble(data[2]);
+			lastHumidade = Double.parseDouble(data[3]);
 			lastDate = convertStringToEpoch(data[0], data[1]);
 			return false;
 		}
@@ -98,7 +98,7 @@ public class DataConverter {
 	}
 
 	public static String convertDate(String date) throws ParseException {
-		Date initDate = new SimpleDateFormat("dd-MM-yyyy").parse(date);
+		Date initDate = new SimpleDateFormat("dd/MM/yyyy").parse(date);
 		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		format.setLenient(false);
 		return format.format(initDate);
