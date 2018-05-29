@@ -20,8 +20,8 @@ public class DataConverter {
 			String[] data = new String[5];
 			data[0] = convertDate(obj.getString("date"));
 			data[1] = obj.getString("time");
-			data[2] = obj.getString("temperatura");
-			data[3] = obj.getString("humidade");
+			data[2] = verifyTemperature(obj.getString("temperatura"));
+			data[3] = verifyHumidity(obj.getString("humidade"));
 			data[4] = obj.getJSONObject("_id").getString("$oid");
 			if (dataCheck(data))
 				if (!isHighVariation(data))
@@ -103,5 +103,15 @@ public class DataConverter {
 		format.setLenient(false);
 		return format.format(initDate);
 	}
-
+	
+	public static String verifyTemperature(String temperature) throws ParseException {
+		double temp = Double.parseDouble(temperature);
+		return String.valueOf(temp);
+	}
+	
+	public static String verifyHumidity(String humidity) throws ParseException {
+		double hum = Double.parseDouble(humidity);
+		return String.valueOf(hum);
+	}
+	
 }
