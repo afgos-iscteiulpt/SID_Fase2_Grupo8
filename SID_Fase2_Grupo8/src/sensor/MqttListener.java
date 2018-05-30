@@ -61,7 +61,7 @@ public class MqttListener {
 		
 		sampleClient.setCallback(cb);
 		sampleClient.connect(connOpts);
-		sampleClient.subscribe(BROKER_TOPIC);
+		sampleClient.subscribe(BROKER_TOPIC, 2);
 		System.out.println("Subscribed");
 		
 		//----------MQTT CLIENT-----------

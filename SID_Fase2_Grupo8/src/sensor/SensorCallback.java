@@ -38,6 +38,8 @@ public class SensorCallback implements MqttCallback {
 				
 				Double.parseDouble(((String) jobj.get("temperature")));
 				Double.parseDouble(((String) jobj.get("humidity")));
+
+				//all good, insert
 				collection.insertOne(new Document().append("date", jobj.get("date")).append("time", jobj.get("time"))
 						.append("temperatura", jobj.get("temperature")).append("humidade", jobj.get("humidity")));
 				
