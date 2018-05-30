@@ -1,9 +1,6 @@
 package sensor;
 
-import static migration.DataConfig.MONGO_DBNAME;
-import static migration.DataConfig.MONGO_PASSWORD;
-import static migration.DataConfig.MONGO_USERNAME;
-import static migration.DataConfig.SENSOR_COLLECTION_NAME;
+import static migration.DataConfig.*;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -18,22 +15,25 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import static com.mongodb.client.model.Filters.*;
 
 import migration.DataConfig;
 
 public class MqttListener {
 	
-	private static final String IPADDR = "localhost";
 	private static final Integer PORT = 27017;
 
 
-	public static void run(String broker, String clientId, String topic) throws UnknownHostException, MqttException {
+	public static void run() throws UnknownHostException, MqttException {
 		
 		new DataConfig().readProperties();
+		String broker = "tcp://"+BROKER_URL+":1883";
+		String topic = BROKER_TOPIC;
+		String IPADDR = MONGO_URI;
+		String clientId = "Listener1";
+		
 		//----------MONGO DB--------------
 		System.out.println("Setting up credentials...");
-		MongoCredential credential = MongoCredential.createCredential(MONGO_USERNAME, "admin",
+		MongoCredential credential = MongoCredential.createCredential(MONGO_USERNAME, MONGO_AUTH_DB,
 				MONGO_PASSWORD.toCharArray());
 		System.out.println("Setting up settings...");
 		MongoClientSettings settings = MongoClientSettings.builder().credential(credential)
@@ -72,9 +72,6 @@ public class MqttListener {
 
 	public static void main(String[] args) throws UnknownHostException, MqttException {
 		System.out.println("Mqtt Listener starting up...");
-		String BROKER_URL = "tcp://iot.eclipse.org:1883";
-		String myTopic = "sid_lab_2018";
-		String clientID = "Listener1";
-		MqttListener.run(BROKER_URL, clientID, myTopic);
+		MqttListener.run();
 	}
 }

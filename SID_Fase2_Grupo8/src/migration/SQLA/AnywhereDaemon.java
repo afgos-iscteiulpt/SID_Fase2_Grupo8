@@ -3,7 +3,6 @@ package migration.SQLA;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import migration.DataConfig;
 import migration.DataStack;
 import static migration.DataConfig.*;
 
