@@ -26,9 +26,6 @@ public class MqttListener {
 	public static void run() throws UnknownHostException, MqttException {
 		
 		new DataConfig().readProperties();
-		String broker = "tcp://"+BROKER_URL+":1883";
-		String topic = BROKER_TOPIC;
-		String IPADDR = MONGO_URI;
 		String clientId = "Listener1";
 		
 		//----------MONGO DB--------------
@@ -38,7 +35,7 @@ public class MqttListener {
 		System.out.println("Setting up settings...");
 		MongoClientSettings settings = MongoClientSettings.builder().credential(credential)
 				.applyToSslSettings(builder -> builder.enabled(false))
-				.applyToClusterSettings(builder -> builder.hosts(Arrays.asList(new ServerAddress(IPADDR, PORT))))
+				.applyToClusterSettings(builder -> builder.hosts(Arrays.asList(new ServerAddress(MONGO_URI, PORT))))
 				.build();
 		
 		System.out.println("Creating Mongo Client...");
@@ -55,7 +52,7 @@ public class MqttListener {
 		//----------MQTT CLIENT-----------
 		SensorCallback cb = new SensorCallback(collection);
 		MemoryPersistence persistence = new MemoryPersistence();
-		MqttClient sampleClient = new MqttClient(broker, clientId, persistence);
+		MqttClient sampleClient = new MqttClient("tcp://"+BROKER_URL+":1883", clientId, persistence);
 		MqttConnectOptions connOpts = new MqttConnectOptions();
 		
 		connOpts.setCleanSession(true);
@@ -64,7 +61,7 @@ public class MqttListener {
 		
 		sampleClient.setCallback(cb);
 		sampleClient.connect(connOpts);
-		sampleClient.subscribe(topic);
+		sampleClient.subscribe(BROKER_TOPIC);
 		System.out.println("Subscribed");
 		
 		//----------MQTT CLIENT-----------
