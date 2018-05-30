@@ -73,5 +73,6 @@ public class MqttListener {
 	public static void main(String[] args) throws UnknownHostException, MqttException {
 		System.out.println("Mqtt Listener starting up...");
 		MqttListener.run();
+
 	}
 }

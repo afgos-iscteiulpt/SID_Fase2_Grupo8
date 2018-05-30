@@ -1,5 +1,7 @@
 package sensor;
 
+import java.util.Calendar;
+
 import org.bson.Document;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -26,14 +28,17 @@ public class SensorCallback implements MqttCallback {
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
 		System.out.println("Message Arrived!");
 		JSONObject jobj = new JSONObject(message.toString());
-		BasicDBObject document = new BasicDBObject();
-//		document.put("humidade", jobj.get("humidity"));
-//		document.put("temperatura", jobj.get("temperature"));
-//		document.put("date", jobj.get("date"));
-//		document.put("time", jobj.get("time"));
-//		System.out.println(document.toString());
-		collection.insertOne(new Document().append("date", jobj.get("date")).append("time", jobj.get("time"))
-				.append("temperatura", jobj.get("temperature")).append("humidade", jobj.get("humidity")));
+			
+		try {
+			if(Integer.parseInt(((String) jobj.get("date")).split("/")[2]) == Calendar.YEAR)
+			Double.parseDouble(((String) jobj.get("temperature")));
+			Double.parseDouble(((String) jobj.get("humidity")));
+			collection.insertOne(new Document().append("date", jobj.get("date")).append("time", jobj.get("time"))
+			.append("temperatura", jobj.get("temperature")).append("humidade", jobj.get("humidity")));
+			System.out.println("iok");
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 	}
 
 	public void deliveryComplete(IMqttDeliveryToken token) {
