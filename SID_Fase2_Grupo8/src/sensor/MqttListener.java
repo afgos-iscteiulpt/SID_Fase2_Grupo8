@@ -73,7 +73,7 @@ public class MqttListener {
 	public static void main(String[] args) throws UnknownHostException, MqttException {
 		System.out.println("Mqtt Listener starting up...");
 		String BROKER_URL = "tcp://iot.eclipse.org:1883";
-		String myTopic = "sid_lab_2018";
+		String myTopic = "/sid_lab_2018";
 		String clientID = "Listener1";
 		MqttListener.run(BROKER_URL, clientID, myTopic);
 	}
