@@ -1,7 +1,6 @@
 package tests;
 
 import migration.DataConfig;
-import migration.DataStack;
 import migration.MongoDB.MongoConnection;
 import migration.SQLA.AnywhereDaemon;
 
