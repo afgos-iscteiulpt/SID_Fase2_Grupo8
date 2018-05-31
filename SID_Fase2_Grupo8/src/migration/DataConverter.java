@@ -36,7 +36,7 @@ public class DataConverter {
 	}
 
 	private static boolean checkHumidade(String string) {
-		int humid = Integer.parseInt(string);
+		double humid = Double.parseDouble(string);
 		if (string != null &&  humid >= 0 && humid < 100) {
 			return true;
 		}
@@ -45,7 +45,7 @@ public class DataConverter {
 	}
 
 	private static boolean checkTemperatura(String string) {
-		if (string != null && Integer.parseInt(string) >= -272) {
+		if (string != null && Double.parseDouble(string) >= -272) {
 			return true;
 		}
 		LogBuffer.writeWarning("Temperature '" + string + "' was not valid");
