@@ -39,11 +39,11 @@ public class MongoConnection extends Thread {
 	}
 
 	public MongoDatabase mongoConnect() {
-		MongoCredential credential = MongoCredential.createCredential(MONGO_USERNAME, "admin",
+		MongoCredential credential = MongoCredential.createCredential(MONGO_USERNAME, MONGO_AUTH_DB,
 				MONGO_PASSWORD.toCharArray());
 		MongoClientSettings settings = MongoClientSettings.builder().credential(credential)
 				.applyToSslSettings(builder -> builder.enabled(false))
-				.applyToClusterSettings(builder -> builder.hosts(Arrays.asList(new ServerAddress("localhost", 27017))))
+				.applyToClusterSettings(builder -> builder.hosts(Arrays.asList(new ServerAddress(MONGO_URI, 27017))))
 				.build();
 		MongoClient mongoClient = MongoClients.create(settings);
 		return mongoClient.getDatabase(MONGO_DBNAME);

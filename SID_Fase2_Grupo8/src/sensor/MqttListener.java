@@ -1,35 +1,58 @@
 package sensor;
 
+import static migration.DataConfig.*;
+
 import java.net.UnknownHostException;
+import java.util.Arrays;
+
+import org.bson.Document;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
+import com.mongodb.*;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+
+import migration.DataConfig;
 
 public class MqttListener {
 	
-	private static final String IPADDR = "localhost";
 	private static final Integer PORT = 27017;
 
 
-	public static void run(String broker, String clientId, String topic) throws UnknownHostException, MqttException {
+	public static void run() throws UnknownHostException, MqttException {
 		
+		new DataConfig().readProperties();
+		String clientId = "Listener1";
 		
 		//----------MONGO DB--------------
-		@SuppressWarnings("resource")
-		MongoClient mongo = new MongoClient(IPADDR, PORT);
-		@SuppressWarnings("deprecation")
-		DB db = mongo.getDB("sid");
-		DBCollection collection = db.getCollection("sid");
+		System.out.println("Setting up credentials...");
+		MongoCredential credential = MongoCredential.createCredential(MONGO_USERNAME, MONGO_AUTH_DB,
+				MONGO_PASSWORD.toCharArray());
+		System.out.println("Setting up settings...");
+		MongoClientSettings settings = MongoClientSettings.builder().credential(credential)
+				.applyToSslSettings(builder -> builder.enabled(false))
+				.applyToClusterSettings(builder -> builder.hosts(Arrays.asList(new ServerAddress(MONGO_URI, PORT))))
+				.build();
+		
+		System.out.println("Creating Mongo Client...");
+		MongoClient mongo = MongoClients.create(settings);
+
+		System.out.println("Grabbing database...");
+		MongoDatabase db = mongo.getDatabase(MONGO_DBNAME);
+
+		System.out.println("Grabbing collection...");
+		MongoCollection<Document> collection = db.getCollection(SENSOR_COLLECTION_NAME);
+
 		//----------MONGO DB--------------
 		
 		//----------MQTT CLIENT-----------
 		SensorCallback cb = new SensorCallback(collection);
 		MemoryPersistence persistence = new MemoryPersistence();
-		MqttClient sampleClient = new MqttClient(broker, clientId, persistence);
+		MqttClient sampleClient = new MqttClient("tcp://"+BROKER_URL+":1883", clientId, persistence);
 		MqttConnectOptions connOpts = new MqttConnectOptions();
 		
 		connOpts.setCleanSession(true);
@@ -38,16 +61,15 @@ public class MqttListener {
 		
 		sampleClient.setCallback(cb);
 		sampleClient.connect(connOpts);
-		sampleClient.subscribe(topic);
+		sampleClient.subscribe(BROKER_TOPIC, 2);
 		System.out.println("Subscribed");
 		
 		//----------MQTT CLIENT-----------
 	}
 
 	public static void main(String[] args) throws UnknownHostException, MqttException {
-		String BROKER_URL = "tcp://iot.eclipse.org:1883";
-		String myTopic = "/sid_lab_2018";
-		String clientID = "Listener1";
-		MqttListener.run(BROKER_URL, clientID, myTopic);
+		System.out.println("Mqtt Listener starting up...");
+		MqttListener.run();
+
 	}
 }
