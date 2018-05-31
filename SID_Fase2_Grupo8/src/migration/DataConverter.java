@@ -15,52 +15,58 @@ public class DataConverter {
 	private static long lastDate = -1000;
 
 	public static String[] convertJsonToStringArray(String json) {
-		try {
-			JSONObject obj = new JSONObject(json);
-			String[] data = new String[5];
-			data[0] = convertDate(obj.getString("date"));
-			data[1] = obj.getString("time");
-			data[2] = obj.getString("temperatura");
-			data[3] = obj.getString("humidade");
-			data[4] = obj.getJSONObject("_id").getString("$oid");
-			if (dataCheck(data))
-				if (!isHighVariation(data))
-					return data;
-			return null;
-		} catch (ParseException e) {
-			e.printStackTrace();
-			return null;
+		JSONObject obj = new JSONObject(json);
+		String[] data = new String[5];
+		data[0] = convertDate(obj.getString("date"));
+		data[1] = obj.getString("time");
+		data[2] = obj.getString("temperatura");
+		data[3] = obj.getString("humidade");
+		data[4] = obj.getJSONObject("_id").getString("$oid");
+		if (dataCheck(data)) {
+			if (!isHighVariation(data))
+				return data;
 		}
+		return null;
 	}
 
-	private static boolean dataCheck(String[] data) throws ParseException {
+	private static boolean dataCheck(String[] data) {
 		// date was already checked in convert date
-		return checkTime(data[1]) && checkTemperatura(data[2]) && checkHumidade(data[3]) && data[4] != null;
+		return checkDate(data[0]) && checkTime(data[1]) && checkTemperatura(data[2]) && checkHumidade(data[3]) && data[4] != null;
 
 	}
 
 	private static boolean checkHumidade(String string) {
-		if (string != null) {
-			int temp = Integer.parseInt(string);
-			return temp >= 0 && temp < 100;
+		int humid = Integer.parseInt(string);
+		if (string != null &&  humid >= 0 && humid < 100) {
+			return true;
 		}
+		LogBuffer.writeWarning("Humidity '" + string + "' was not valid");
 		return false;
 	}
 
 	private static boolean checkTemperatura(String string) {
-		if (string != null) {
-			int temp = Integer.parseInt(string);
-			return temp >= -272;
+		if (string != null && Integer.parseInt(string) >= -272) {
+			return true;
 		}
+		LogBuffer.writeWarning("Temperature '" + string + "' was not valid");
 		return false;
 	}
 
-	private static boolean checkTime(String string) throws ParseException {
-		DateFormat format = new SimpleDateFormat("HH:mm:ss");
-		format.setLenient(false);
-		@SuppressWarnings("unused") // if it's an invalid date, the parse will throw an exception
-		Date theDate = format.parse(string);
+	private static boolean checkTime(String string) {
+		try {
+			DateFormat format = new SimpleDateFormat("HH:mm:ss");
+			format.setLenient(false);
+			@SuppressWarnings("unused") // if it's an invalid time, the parse will throw an exception
+			Date theDate = format.parse(string);
+		} catch (ParseException e) {
+			LogBuffer.writeWarning("Time '" + string + "' was not valid");
+			return false;
+		}
 		return true;
+	}
+	
+	private static boolean checkDate(String string) {
+		return string!=null;
 	}
 
 	private static boolean isHighVariation(String[] data) {
@@ -75,6 +81,8 @@ public class DataConverter {
 			double humidadeDifference = Integer.parseInt(data[3]) - lastHumidade;
 			if (temperaturaDifference / timeDifferenceInSeconds > maxVariationFlowPerSecond
 					|| humidadeDifference / timeDifferenceInSeconds > maxVariationFlowPerSecond) {
+				LogBuffer.writeWarning("High Variation - Last Values     - Time:" + convertEpochToString(lastDate) + ", Temperature: " + lastTemperatura + ", Humidity: " + lastHumidade);
+				LogBuffer.writeWarning("High Variation - Values Detected - Time:" + data[0] + " " + data[1] + ", Temperature: " + Integer.parseInt(data[2]) + ", Humidity: " + Integer.parseInt(data[3]));
 				return true;
 			}
 			lastTemperatura = Integer.parseInt(data[2]);
@@ -82,6 +90,11 @@ public class DataConverter {
 			lastDate = convertStringToEpoch(data[0], data[1]);
 			return false;
 		}
+	}
+	
+	private static String convertEpochToString(long time) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return sdf.format(new Date(time));
 	}
 
 	private static long convertStringToEpoch(String date, String time) {
@@ -97,11 +110,17 @@ public class DataConverter {
 		}
 	}
 
-	public static String convertDate(String date) throws ParseException {
-		Date initDate = new SimpleDateFormat("dd-MM-yyyy").parse(date);
-		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-		format.setLenient(false);
-		return format.format(initDate);
+	public static String convertDate(String date) {
+		Date initDate;
+		try {
+			initDate = new SimpleDateFormat("dd/MM/yyyy").parse(date);
+			DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+			format.setLenient(false);
+			return format.format(initDate);
+		} catch (ParseException e) {
+			LogBuffer.writeWarning("Date '" + date + "' was not valid");
+			return null;
+		}
 	}
 
 }
